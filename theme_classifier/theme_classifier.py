@@ -12,7 +12,7 @@ folder_path = pathlib.Path(__file__).parent.resolve()
 sys.path.append(os.path.join(folder_path, '../'))
 from utils import load_subtitles_dataset
 nltk.download("punkt")
-nltk.download('pnkt_tab')
+nltk.download('punkt_tab')
 
 class ThemeClassifier():
     def __init__(self, theme_list):
@@ -57,7 +57,7 @@ class ThemeClassifier():
                     themes[label] = []
                 themes[label].append(score)
 
-        themes = {key: np.mean(np.array(value)) for key, value in themes.items()}
+        themes = {key: np.mean(value) for key, value in themes.items()}
 
         return themes
     
@@ -69,14 +69,17 @@ class ThemeClassifier():
 
         # load dataset
         df = load_subtitles_dataset(dataset_path)
+        # df = df.head(2)
 
         # Run Inference
         output_themes = df['script'].apply(self.get_theme_inference)
 
         # Wrangle output
 
-        themes_df = pd.DataFrame(output_themes.to_list())
+        themes_df = pd.DataFrame(output_themes.tolist())
         df[themes_df.columns] = themes_df
 
         if save_path is not None:
             df.to_csv(save_path, index=False)
+
+        return df
