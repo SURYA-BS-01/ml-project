@@ -11,16 +11,15 @@ def get_themes(theme_list_str,subtitles_path,save_path):
 
     theme_output = output_df.drop(['episode', 'script'], axis=1).sum().reset_index()
     theme_output.columns = ['theme', 'score']
-    theme_output
 
-    print(theme_output)
+    # print(theme_output)
 
     # output_df = output_df[theme_list].sum().reset_index()
     # output_df.columns = ['Theme','Score']
     # print(output_df)
 
     output_chart = gr.BarPlot(
-        output_df,
+        theme_output,
         x="Theme",
         y="Score",
         title="Series Themes",
@@ -54,5 +53,5 @@ def main():
 if __name__ == '__main__':
     # get_themes('friendship,hope,sacrifice,battle,self development,betrayal,love,dialogue',
     #             'data/subtitles',
-    #             'stubs/output.csv')
+    #             'stubs/output_file.csv')
     main()

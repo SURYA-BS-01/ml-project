@@ -40,12 +40,11 @@ class ThemeClassifier():
         
         # Run Model
         theme_output = self.theme_classifier(
-            script_batches,
+            script_batches[:2],
             self.theme_list,
             multi_label=True
         )
 
-        print("theme_output: " + theme_output)
         # Wrangle Output 
         themes = {}
         for output in theme_output:
@@ -66,14 +65,12 @@ class ThemeClassifier():
 
         # load Dataset
         df = load_subtitles_dataset(dataset_path)
-        print(df)
-
+        df = df.head(2)
         # Run Inference
         output_themes = df['script'].apply(self.get_themes_inference)
 
         themes_df = pd.DataFrame(output_themes.tolist())
         df[themes_df.columns] = themes_df
-        print("After get_theme_inference: ", df)
 
         # Save output
         if save_path is not None:
