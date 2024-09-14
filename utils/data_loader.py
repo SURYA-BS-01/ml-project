@@ -9,7 +9,7 @@ def load_subtitles_dataset(dataset_path):
     for path in subtitles_paths:
         
         # read lines
-        with open(path, 'r') as file:
+        with open(path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
             lines = lines[27:]
             lines = [",".join(line.split(',')[9:]) for line in lines]
