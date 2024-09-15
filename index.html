@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Score Bar Chart</title>
+</head>
+<body>
+    <h1>Generate Theme Score Bar Chart</h1>
+    
+    <form id="themeForm">
+        <label for="theme_list">Enter Theme List (comma separated):</label><br>
+        <input type="text" id="theme_list" name="theme_list" placeholder="friendship,hope,sacrifice,battle..." required><br><br>
+        
+        <label for="subtitles_path">Dataset Path:</label><br>
+        <input type="text" id="subtitles_path" name="subtitles_path" placeholder="/path/to/dataset" required><br><br>
+        
+        <label for="save_path">Save Path for CSV:</label><br>
+        <input type="text" id="save_path" name="save_path" placeholder="/path/to/save/output.csv" required><br><br>
+
+        <button type="submit">Generate Bar Chart</button>
+    </form>
+
+    <h2>Bar Chart:</h2>
+    <img id="chart" alt="Theme Bar Chart" style="display: none;">
+    <p id="error" style="color: red;"></p>
+
+    <script>
+        document.getElementById('themeForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            const themeList = document.getElementById('theme_list').value;
+            const subtitlesPath = document.getElementById('subtitles_path').value;
+            const savePath = document.getElementById('save_path').value;
+
+            // Create FormData to send the input
+            const formData = new FormData();
+            formData.append('theme_list', themeList);
+            formData.append('subtitles_path', subtitlesPath);
+            formData.append('save_path', savePath);
+
+            try {
+                // Send POST request to FastAPI backend
+                const response = await fetch('/generate-bar-chart/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.image_url) {
+                    // Display the bar chart image
+                    const chart = document.getElementById('chart');
+                    chart.src = data.image_url;
+                    chart.style.display = 'block';
+                    document.getElementById('error').textContent = '';
+                } else {
+                    throw new Error(data.error || 'Failed to generate chart');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('error').textContent = `Error: ${error.message}`;
+                document.getElementById('chart').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
