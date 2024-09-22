@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 from theme_classifier import ThemeClassifier
+from character_network import NamedEntityRecognizer, CharacterNetworkGenerator
 
 app = FastAPI()
 
@@ -50,6 +51,21 @@ async def generate_bar_chart(theme_list: str = Form(...), subtitles_path: str = 
     except Exception as e:
         print(f"Error generating chart: {str(e)}")
         return {"error": str(e)}
+
+@app.get("/character-network")
+async def get_character_network(subtitles_path: str, ner_path: str):
+    try:
+        ner = NamedEntityRecognizer()
+        ner_df = ner.get_ners(subtitles_path, ner_path)
+
+        character_network_generator = CharacterNetworkGenerator()
+        relationship_df = character_network_generator.generate_character_network(ner_df)
+        html = character_network_generator.draw_network_graph(relationship_df)
+
+        return HTMLResponse(content=html, status_code=200)
+    except Exception as e:
+        return {"error": str(e)}
+
 
 @app.get("/themes-bar-chart")
 def get_bar_chart_image():

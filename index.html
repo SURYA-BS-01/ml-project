@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theme Score Bar Chart</title>
+    <title>Theme Score Bar Chart & Character Network</title>
 </head>
 <body>
     <h1>Generate Theme Score Bar Chart</h1>
@@ -25,7 +25,25 @@
     <img id="chart" alt="Theme Bar Chart" style="display: none;">
     <p id="error" style="color: red;"></p>
 
+    <!-- Form for Character Network -->
+    <h1>Generate Character Network</h1>
+
+    <form id="characterForm">
+        <label for="char_subtitles_path">Subtitles Path:</label><br>
+        <input type="text" id="char_subtitles_path" name="char_subtitles_path" placeholder="/path/to/subtitles" required><br><br>
+
+        <label for="ner_path">NER Path:</label><br>
+        <input type="text" id="ner_path" name="ner_path" placeholder="/path/to/ner/output" required><br><br>
+
+        <button type="submit">Generate Character Network</button>
+    </form>
+
+    <h2>Character Network:</h2>
+    <div id="networkContainer"></div>
+    <p id="charError" style="color: red;"></p>
+
     <script>
+        // Theme Bar Chart Submission
         document.getElementById('themeForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             
@@ -61,6 +79,33 @@
                 console.error('Error:', error);
                 document.getElementById('error').textContent = `Error: ${error.message}`;
                 document.getElementById('chart').style.display = 'none';
+            }
+        });
+
+        // Character Network Submission
+        document.getElementById('characterForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const subtitlesPath = document.getElementById('char_subtitles_path').value;
+            const nerPath = document.getElementById('ner_path').value;
+
+            try {
+                // Send GET request to FastAPI backend
+                const response = await fetch(`/character-network?subtitles_path=${encodeURIComponent(subtitlesPath)}&ner_path=${encodeURIComponent(nerPath)}`);
+
+                const htmlContent = await response.text();
+
+                if (response.ok) {
+                    // Display the character network
+                    document.getElementById('networkContainer').innerHTML = htmlContent;
+                    document.getElementById('charError').textContent = '';
+                } else {
+                    throw new Error('Failed to generate character network');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('charError').textContent = `Error: ${error.message}`;
+                document.getElementById('networkContainer').innerHTML = '';
             }
         });
     </script>
