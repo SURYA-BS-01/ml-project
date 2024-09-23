@@ -42,6 +42,27 @@
     <div id="networkContainer"></div>
     <p id="charError" style="color: red;"></p>
 
+    <!-- Text Classification -->
+    <h1>Text Classification</h1>
+
+    <form id="textForm">
+        <label for="model_path">Model Path:</label><br>
+        <input type="text" id="model_path" name="model_path" placeholder="/path/to/subtitles" required><br><br>
+
+        <label for="data_path">Data Path:</label><br>
+        <input type="text" id="data_path" name="data_path" placeholder="/path/to/ner/output" required><br><br>
+        
+        <label for="text_input">Text Input:</label><br>
+        <input type="text" id="text_input" name="text_input" placeholder="/path/to/ner/output" required><br><br>
+
+        <button type="submit">Classify Text</button>
+    </form>
+    <h2>Jutsu Type: </h2>
+    <p id="jutsu-type"></p>
+    <p id="jutsu-type-error" style="color: red;"></p>
+
+
+
     <script>
         // Theme Bar Chart Submission
         document.getElementById('themeForm').addEventListener('submit', async function (e) {
@@ -79,6 +100,44 @@
                 console.error('Error:', error);
                 document.getElementById('error').textContent = `Error: ${error.message}`;
                 document.getElementById('chart').style.display = 'none';
+            }
+        });
+
+        // Text Classification Submission
+        document.getElementById('textForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            const model_path = document.getElementById('model_path').value;
+            const data_path = document.getElementById('data_path').value;
+            const text_input = document.getElementById('text_input').value;
+
+            // Create FormData to send the input
+            const formData = new FormData();
+            formData.append('model_path', model_path);
+            formData.append('data_path', data_path);
+            formData.append('text_input', text_input);
+
+            try {
+                // Send POST request to FastAPI backend
+                const response = await fetch('/text-classification/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.jutsu_type) {
+                    // Display the bar chart image
+                    const jutsu = document.getElementById('jutsu-type');
+                    jutsu.textContent = data.jutsu_type;
+                    document.getElementById('jutsu-type-error').textContent = '';
+                } else {
+                    throw new Error(data.error || 'Failed to generate chart');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('jutsu-type-error').textContent = `Error: ${error.message}`;
+                document.getElementById('jutsu-type').style.display = 'none';
             }
         });
 

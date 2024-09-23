@@ -5,8 +5,13 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+
+from dotenv import load_dotenv
+load_dotenv()
+
 from theme_classifier import ThemeClassifier
 from character_network import NamedEntityRecognizer, CharacterNetworkGenerator
+from text_classification import JutsuClassifier
 
 app = FastAPI()
 
@@ -68,12 +73,32 @@ async def get_character_network(subtitles_path: str, ner_path: str):
 
 
 @app.get("/themes-bar-chart")
-def get_bar_chart_image():
+async def get_bar_chart_image():
     chart_path = Path("static/theme_bar_chart.png")
     if chart_path.exists():
         return FileResponse(chart_path)
     else:
         return {"error": "Chart not found"}
+
+@app.post("/text-classification/")
+async def classify_text(
+    model_path: str = Form(...),
+    data_path: str = Form(...),
+    text_input: str = Form(...)
+):
+    try:
+        jutsu_classifier = JutsuClassifier(model_path = model_path,
+                                       data_path = data_path,
+                                       huggingface_token = os.getenv('huggingface_token'))
+    
+        output = jutsu_classifier.classify_jutsu(text_input)
+        output = output[0]
+        
+        return {"jutsu_type": output}
+    
+    except Exception as e:
+        return {"error": str(e)}
+
 
 if __name__ == '__main__':
     import uvicorn
