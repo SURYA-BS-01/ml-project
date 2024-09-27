@@ -37,7 +37,7 @@ class NamedEntityRecognizer:
 
             # CSVs don't save lists. It is saved as strings. so convert it
             df['ners'] = df['ners'].apply(lambda x : literal_eval(x) if isinstance(x, str) else x)
-            return 
+            return df
         
         df = load_subtitles_dataset(dataset_path)
 

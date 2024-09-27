@@ -12,6 +12,10 @@ load_dotenv()
 from theme_classifier import ThemeClassifier
 from character_network import NamedEntityRecognizer, CharacterNetworkGenerator
 from text_classification import JutsuClassifier
+<<<<<<< HEAD
+=======
+from character_chatbot import CharacterChatBot
+>>>>>>> 51c4277 (Character Chatbot)
 
 app = FastAPI()
 
@@ -22,6 +26,23 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def get():
     html_file = Path("index.html")
     return HTMLResponse(content=html_file.read_text(), status_code=200)
+
+@app.post("/character_chatbot")
+async def chat_with_character_chatbot(message: str = Form(...), history: str = Form(...)):
+    try:
+        # Token is fetched from environment variables
+        character_chatbot = CharacterChatBot("SuryaBS/Naruto_Llama-3-8B",
+                                             huggingface_token=os.getenv("huggingface_token"))
+
+        # Split history by commas to convert it back into a list format
+        history_list = history.split(',') if history else []
+        output = character_chatbot.chat(message, history_list)
+        output = output['content'].strip()
+
+        return output
+    except Exception as e:
+        return {"error": str(e)}
+
 
 @app.post("/generate-bar-chart/")
 async def generate_bar_chart(theme_list: str = Form(...), subtitles_path: str = Form(...), save_path: str = Form(...)):
