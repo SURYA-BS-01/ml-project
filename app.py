@@ -12,10 +12,8 @@ load_dotenv()
 from theme_classifier import ThemeClassifier
 from character_network import NamedEntityRecognizer, CharacterNetworkGenerator
 from text_classification import JutsuClassifier
-<<<<<<< HEAD
-=======
+
 from character_chatbot import CharacterChatBot
->>>>>>> 51c4277 (Character Chatbot)
 
 app = FastAPI()
 
